@@ -175,6 +175,10 @@ class HarnessNamespaceStep(Step):
         errors: list,
     ):
         """Create the harness namespace if it doesn't exist."""
+        check = cmd.kube("get", "namespace", harness_ns)
+        if check.success:
+            return
+
         ns_yaml = f"""apiVersion: v1
 kind: Namespace
 metadata:

@@ -163,24 +163,38 @@ def wait_for_pods_by_label(
     """
     errors: list[str] = []
 
-    # Phase A: Wait for pods to become Ready (running)
+    def _all_pods_terminal() -> bool:
+        phases = cmd.kube(
+            "get", "pods", "-l", f"app={label}", "--namespace", namespace,
+            "-o", "jsonpath={.items[*].status.phase}", check=False,
+        )
+        if not phases.success:
+            return False
+        vals = phases.stdout.split()
+        return bool(vals) and all(p in ("Succeeded", "Failed") for p in vals)
+
+    # Phase A: Wait for pods to become Ready — unless they already finished.
     context.logger.log_info(
         f"Waiting for pods (label=app={label}) to start (timeout={timeout}s)..."
     )
-    result = cmd.kube(
-        "wait",
-        "--for=condition=Ready=True",
-        "pod",
-        "-l",
-        f"app={label}",
-        "--namespace",
-        namespace,
-        f"--timeout={timeout}s",
-        check=False,
-    )
-    if not result.success:
-        errors.append(f"Pods failed to become Ready: {result.stderr.strip()}")
-        return errors
+    if _all_pods_terminal():
+        context.logger.log_info("All pods already terminal — skipping Ready wait")
+    else:
+        result = cmd.kube(
+            "wait",
+            "--for=condition=Ready=True",
+            "pod",
+            "-l",
+            f"app={label}",
+            "--namespace",
+            namespace,
+            f"--timeout={timeout}s",
+            check=False,
+        )
+        # A pod that finished mid-wait flips to terminal, not Ready — tolerate that.
+        if not result.success and not _all_pods_terminal():
+            errors.append(f"Pods failed to become Ready: {result.stderr.strip()}")
+            return errors
 
     context.logger.log_info("All pods are running")
 

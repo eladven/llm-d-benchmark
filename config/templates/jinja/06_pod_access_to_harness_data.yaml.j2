@@ -7,6 +7,9 @@ metadata:
     role: llm-d-benchmark-data-access
   namespace: {{ namespace.name }}
 spec:
+{% if dataAccess.serviceAccount is defined and dataAccess.serviceAccount %}
+  serviceAccountName: {{ dataAccess.serviceAccount }}
+{% endif %}
   containers:
   - name: rsync
     image: {{ images.benchmark.repository }}:{{ images.benchmark.tag }}

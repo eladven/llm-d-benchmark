@@ -9,8 +9,8 @@ scenario:
   - name: "eval-aider-polyglot"
 
     model:
-      name: facebook/opt-125m
-      shortName: facebook-opt-125m
+      name: claude-sonnet-4-6
+      shortName: claude-sonnet-4-6
       path: models/facebook/opt-125m
       huggingfaceId: facebook/opt-125m
       gpuMemoryUtilization: 0
