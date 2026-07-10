@@ -63,7 +63,7 @@ llmdbenchmark --spec guides/workload-autoscaling standup  -p <namespace>
 
 The shared cluster-wide infrastructure (`prometheus-adapter`, ClusterRole,
 prometheus-ca ConfigMap) survives teardown automatically - see
-[Section 4](#4-cluster-wide-vs-per-tenant-resources--teardown-semantics)
+[Section 4](#4-cluster-wide-vs-per-tenant-resources-and-teardown-semantics)
 for the full preservation policy.
 
 ---
@@ -313,7 +313,7 @@ chartVersions:
 
 ---
 
-## 4. Cluster-wide vs per-tenant resources & teardown semantics
+## 4. Cluster-wide vs per-tenant resources and teardown semantics
 
 WVA installs a mix of cluster-wide and per-tenant resources. To keep
 multi-tenant clusters healthy, our standup and teardown follow this policy:
